@@ -1,6 +1,6 @@
 # Optimizing-Latency-in-Machine-Learning-Apps___Strategies-for-Efficient-Model-Loading.
 
-## Strategy 1: Model Loading on Every Prediction Call (Loading Per Request )
+## Model Loading on Every Prediction Call (Loading Per Request )
 The way the machine learning model is being loaded in this script can negatively impact latency due to the following reasons:
 
 ## Issues Affecting Latency with this strategy
@@ -76,8 +76,10 @@ model_handler = ModelHandler()
 
 
 
-# Optimizations to Reduce Latency
-Preload the Model on API Startup
+
+# Strategies for Optimizations to Reduce Latency
+
+## Strategy 1: Preload the Model on API Startup
 Modify the script to load the model when the API starts instead of on every request.
 
 
@@ -109,4 +111,33 @@ Expected Performance Improvement
 Faster Predictions: Model is already in memory when requests come in.
 Lower Latency: No disk reads for every prediction request.
 Better Scalability: Reduces I/O bottlenecks, improving API response times under load.
+
+
+# Strategy 2: Preloading Models at Startup (Global Instance)
+
+Load the model during application startup and reuse it globally.
+
+from fastapi import FastAPI
+
+app = FastAPI()
+predictor = None  # Global instance
+
+# --- Preload Model at Startup ---
+@app.on_event("startup")
+def load_model():
+    global predictor
+    predictor = ModelPredictor("model_v1.pkl")  # Initialize once
+
+# --- Endpoint ---
+@app.post("/predict")
+async def predict_endpoint(data: dict):
+    processed_data = predictor.preprocess(data)
+    return {"prediction": predictor.predict(processed_data)}
+
+
+## Key Features:
+
+* Simple and explicit initialization at startup.
+
+* Avoids repeated model loading.
 
