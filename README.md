@@ -3,7 +3,7 @@
 ## Strategy 1: Model Loading on Every Prediction Call (Loading Per Request )
 The way the machine learning model is being loaded in this script can negatively impact latency due to the following reasons:
 
-Issues Affecting Latency with this strategy
+## Issues Affecting Latency with this strategy
 
 ## Model Loading on Every Prediction Call
 
