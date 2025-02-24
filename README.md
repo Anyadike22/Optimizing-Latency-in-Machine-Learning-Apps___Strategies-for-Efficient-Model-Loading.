@@ -113,7 +113,7 @@ Lower Latency: No disk reads for every prediction request.
 Better Scalability: Reduces I/O bottlenecks, improving API response times under load.
 
 
-# Strategy 2: Preloading Models at Startup (Global Instance)
+## Strategy 2: Preloading Models at Startup (Global Instance)
 
 Load the model during application startup and reuse it globally.
 
@@ -140,4 +140,40 @@ async def predict_endpoint(data: dict):
 * Simple and explicit initialization at startup.
 
 * Avoids repeated model loading.
+
+## Strategy 3 : Dependency Injection (Recommended for FastAPI)
+Load the model once and reuse it across requests, avoiding redundant instantiation.
+
+```python
+from fastapi import FastAPI, Depends
+from functools import lru_cache
+
+app = FastAPI()
+
+# --- ModelPredictor Class (OOP) ---
+class ModelPredictor:
+    def __init__(self, model_path: str):
+        self.model = self._load_model(model_path)  # Preload at startup
+    
+    def _load_model(self, model_path: str):
+        # Simulate model loading (e.g., from pickle, ONNX, TF SavedModel)
+        print(f"Loading model from {model_path}...")
+        return "Mock Model"  # Replace with actual model
+    
+    def predict(self, data: dict):
+        return self.model  # Replace with actual prediction logic
+
+# --- Dependency Injection with Caching ---
+@lru_cache  # Ensures the model is loaded ONCE, not per request
+def get_predictor():
+    return ModelPredictor("model_v1.pkl")
+
+# --- FastAPI Endpoint ---
+@app.post("/predict")
+async def predict_endpoint(
+    data: dict, 
+    predictor: ModelPredictor = Depends(get_predictor)  # Reuse the same instance
+):
+    return {"prediction": predictor.predict(data)}
+```
 
