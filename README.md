@@ -136,12 +136,13 @@ Better Scalability: Reduces I/O bottlenecks, improving API response times under 
 
 Load the model during application startup and reuse it globally.
 
+```
 from fastapi import FastAPI
 
 app = FastAPI()
 predictor = None  # Global instance
 
-```
+
 # --- Preload Model at Startup ---
 @app.on_event("startup")
 def load_model():
