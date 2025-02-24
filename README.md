@@ -228,3 +228,28 @@ def initialize_model():
 async def predict_endpoint(data: dict):
     return {"prediction": predictor.predict(data)}
 ```
+
+# Conclusion 
+
+The latency optimization strategies discussed—preloading models at startup, singleton patterns, and dependency injection—address the inefficiencies of reloading ML models per request, ensuring scalable, low-latency real-time predictions.
+
+## Preloading Models at Startup:
+
+Loads models into memory during application initialization, eliminating redundant I/O operations during inference.
+
+Simplifies resource management but requires careful handling of global state.
+
+## Singleton Pattern:
+
+Enforces a single instance of the model across requests, reducing memory overhead and ensuring consistency.
+
+Ideal for scenarios requiring strict control over model access but less flexible for dynamic model switching.
+
+## Dependency Injection (FastAPI):
+
+Recommended Approach: Uses FastAPI’s Depends with @lru_cache to load models once and reuse them across requests.
+
+Balances thread safety, testability, and scalability while aligning with modern API design practices.
+
+## Final Recommendation:
+For production-grade ML APIs, dependency injection is optimal, combining FastAPI’s async capabilities with OOP principles to minimize latency while maintaining clean, maintainable code. Preloading models at startup (via singletons or global instances) ensures consistent performance, making these strategies essential for high-traffic, real-time systems.
