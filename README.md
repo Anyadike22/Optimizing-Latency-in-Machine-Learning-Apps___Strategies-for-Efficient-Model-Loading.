@@ -136,7 +136,7 @@ Better Scalability: Reduces I/O bottlenecks, improving API response times under 
 
 Load the model during application startup and reuse it globally.
 
-```
+```python 
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -198,3 +198,32 @@ async def predict_endpoint(
     return {"prediction": predictor.predict(data)}
 ```
 
+
+## Strategy 4: Singleton Pattern
+Enforce a single instance of ModelPredictor across the application.
+
+```python 
+class SingletonModelPredictor:
+    _instance = None
+
+    def __new__(cls, model_path: str):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+            cls._instance.model = cls._load_model(model_path)
+        return cls._instance
+
+    @staticmethod
+    def _load_model(model_path: str):
+        print(f"Loading model from {model_path}...")
+        return "Mock Model"
+
+# --- FastAPI Usage ---
+@app.on_event("startup")  # Preload at startup
+def initialize_model():
+    global predictor
+    predictor = SingletonModelPredictor("model_v1.pkl")
+
+@app.post("/predict")
+async def predict_endpoint(data: dict):
+    return {"prediction": predictor.predict(data)}
+```
