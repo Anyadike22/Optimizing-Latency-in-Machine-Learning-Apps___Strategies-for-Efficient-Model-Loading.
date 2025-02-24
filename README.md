@@ -118,13 +118,14 @@ Use a More Efficient Model Storage Method
 
 ## Note: Instead of using pickle, consider joblib, which is optimized for storing and loading large NumPy arrays.
 
-
+```python 
 import joblib
 def save_model(self):
     joblib.dump(self.model, 'model.pkl')
 
 def load_model(self):
     self.model = joblib.load('model.pkl')
+```
     
 Expected Performance Improvement
 Faster Predictions: Model is already in memory when requests come in.
