@@ -73,3 +73,40 @@ api = FastAPI(title="ML Model Serving API with OOP", version="1.0")
 
 #Initialize the model handler
 model_handler = ModelHandler()
+
+
+
+# Optimizations to Reduce Latency
+Preload the Model on API Startup
+Modify the script to load the model when the API starts instead of on every request.
+
+
+@api.on_event("startup")
+def load_model_on_startup():
+    model_handler.load_model()
+This ensures that the model is in memory before any request comes in.
+Remove Unnecessary File I/O
+Modify the Predict method to assume the model is always loaded:
+
+
+def Predict(self, input_data: np.ndarray):
+    if self.model is None:
+        raise HTTPException(status_code=500, detail="Model not loaded")
+    return self.model.predict(input_data)
+Use a More Efficient Model Storage Method
+
+## Note: Instead of using pickle, consider joblib, which is optimized for storing and loading large NumPy arrays.
+
+
+import joblib
+def save_model(self):
+    joblib.dump(self.model, 'model.pkl')
+
+def load_model(self):
+    self.model = joblib.load('model.pkl')
+    
+Expected Performance Improvement
+Faster Predictions: Model is already in memory when requests come in.
+Lower Latency: No disk reads for every prediction request.
+Better Scalability: Reduces I/O bottlenecks, improving API response times under load.
+
