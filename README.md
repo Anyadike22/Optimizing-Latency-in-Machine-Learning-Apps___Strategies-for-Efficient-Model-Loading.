@@ -82,20 +82,39 @@ model_handler = ModelHandler()
 ## Strategy 1: Preload the Model on API Startup
 Modify the script to load the model when the API starts instead of on every request.
 
+```python
+from fastapi import FastAPI
 
-@api.on_event("startup")
-def load_model_on_startup():
-    model_handler.load_model()
+app = FastAPI()
+predictor = None  # Global instance
+
+# --- Preload Model at Startup ---
+@app.on_event("startup")
+def load_model():
+    global predictor
+    predictor = ModelPredictor("model_v1.pkl")  # Initialize once
+
+# --- Endpoint ---
+@app.post("/predict")
+async def predict_endpoint(data: dict):
+    processed_data = predictor.preprocess(data)
+    return {"prediction": predictor.predict(processed_data)}
+```
+
 This ensures that the model is in memory before any request comes in.
 Remove Unnecessary File I/O
+
+
+
 Modify the Predict method to assume the model is always loaded:
 
-
+```
 def Predict(self, input_data: np.ndarray):
     if self.model is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
     return self.model.predict(input_data)
 Use a More Efficient Model Storage Method
+```
 
 ## Note: Instead of using pickle, consider joblib, which is optimized for storing and loading large NumPy arrays.
 
@@ -122,6 +141,7 @@ from fastapi import FastAPI
 app = FastAPI()
 predictor = None  # Global instance
 
+```
 # --- Preload Model at Startup ---
 @app.on_event("startup")
 def load_model():
@@ -133,7 +153,7 @@ def load_model():
 async def predict_endpoint(data: dict):
     processed_data = predictor.preprocess(data)
     return {"prediction": predictor.predict(processed_data)}
-
+```
 
 ## Key Features:
 
