@@ -15,6 +15,8 @@ The model is not preloaded into memory when the FastAPI server starts.
 Instead, it's only loaded when a prediction request is made (if self.model is None).
 This causes unnecessary disk reads, slowing down response times.
 
+(strategy 1 script)
+
 pip install fastapi uvicorn scikit-learn
 
 from fastapi import FastAPI, HTTPException
